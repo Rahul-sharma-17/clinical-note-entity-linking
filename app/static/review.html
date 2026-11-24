@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clinical Note Review</title>
+<script src="/static/theme.js?v=workbench-2"></script>
+<link rel="stylesheet" href="/static/review.css?v=workbench-2">
+<script type="module" src="/static/review.js?v=workbench-3"></script>
+</head><body>
+<header class="toolbar">
+  <div class="brand">
+    <div class="brand-icon">
+      <svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M5 4h14v16H5z"/><path d="M8 9h8M8 12h5M8 15h3"/></svg>
+    </div>
+    <div class="heading">
+      <h1>Clinical Note Review</h1>
+      <p class="subtitle">SNOMED CT entity linking</p>
+    </div>
+  </div>
+  <div class="toolbar-controls">
+
+
+    <button id="custom-toggle" class="btn-custom" aria-controls="custom-form" aria-expanded="false">
+      <svg class="ctrl-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z"/></svg>
+      Paste Custom Note
+    </button>
+    <button id="open-metrics" aria-haspopup="dialog" class="btn-secondary">
+      <svg class="ctrl-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M15.5 2A1.5 1.5 0 0 0 14 3.5v13a1.5 1.5 0 0 0 3 0v-13A1.5 1.5 0 0 0 15.5 2ZM10 7a1.5 1.5 0 0 0-1.5 1.5v8a1.5 1.5 0 0 0 3 0v-8A1.5 1.5 0 0 0 10 7ZM4.5 11A1.5 1.5 0 0 0 3 12.5v4a1.5 1.5 0 0 0 3 0v-4A1.5 1.5 0 0 0 4.5 11Z"/></svg>
+      Metrics
+    </button>
+    <div class="export-group">
+      <button id="export-toggle" class="btn-secondary" aria-expanded="false" aria-controls="export-options">
+        <svg class="ctrl-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M10.75 2.75a.75.75 0 0 0-1.5 0v8.614L6.295 8.235a.75.75 0 1 0-1.09 1.03l4.25 4.5a.75.75 0 0 0 1.09 0l4.25-4.5a.75.75 0 0 0-1.09-1.03l-2.955 3.129V2.75Z"/><path d="M3.5 12.75a.75.75 0 0 0-1.5 0v2.5A2.75 2.75 0 0 0 4.75 18h10.5A2.75 2.75 0 0 0 18 15.25v-2.5a.75.75 0 0 0-1.5 0v2.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-2.5Z"/></svg>
+        Export
+      </button>
+      <div id="export-options" class="export-dropdown" hidden>
+        <button id="download-csv" disabled>
+          <svg class="ctrl-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M4.5 2A1.5 1.5 0 0 0 3 3.5v13A1.5 1.5 0 0 0 4.5 18h11a1.5 1.5 0 0 0 1.5-1.5V7.621a1.5 1.5 0 0 0-.44-1.06l-4.12-4.122A1.5 1.5 0 0 0 11.378 2H4.5Z" clip-rule="evenodd"/></svg>
+          Download CSV
+        </button>
+        <button id="download-json" disabled>
+          <svg class="ctrl-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M4.5 2A1.5 1.5 0 0 0 3 3.5v13A1.5 1.5 0 0 0 4.5 18h11a1.5 1.5 0 0 0 1.5-1.5V7.621a1.5 1.5 0 0 0-.44-1.06l-4.12-4.122A1.5 1.5 0 0 0 11.378 2H4.5Z" clip-rule="evenodd"/></svg>
+          Download JSON
+        </button>
+      </div>
+    </div>
+    <button id="theme-toggle" aria-label="Toggle theme" aria-pressed="true" class="btn-theme">
+      <span class="theme-symbols" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 1v3m0 16v3M1 12h3m16 0h3M4 4l2 2m12 12 2 2M4 20l2-2M18 6l2-2"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M21 14a9 9 0 0 1-11-11 9 9 0 1 0 11 11Z"/></svg>
+      </span>
+      <span class="theme-description">Theme: Dark</span>
+    </button>
+  </div>
+</header>
+
+<main>
+  <section class="case-overview" aria-label="Case overview">
+    <div class="case-summary">
+    <label class="case-picker">
+      <span>Current case</span>
+      <select id="note-select" aria-label="Validation note or custom text" disabled>
+        <option value="custom" hidden>Custom note</option>
+        <optgroup label="Validation notes" id="validation-options"></optgroup>
+      </select>
+    </label>
+      <div class="case-progress"><progress id="completion-meter" value="0" max="1" aria-labelledby="review-progress"></progress><span id="review-progress">0 / 0 Reviewed</span></div>
+    </div>
+  <div class="summary" id="review-count" aria-live="polite">
+    <div class="stat-card">
+      <span class="stat-label">Total Mentions</span>
+      <strong class="stat-value" id="total-count">0</strong>
+    </div>
+    <div class="stat-card approved">
+      <span class="stat-label">Approved</span>
+      <strong class="stat-value" id="approved-count">0</strong>
+    </div>
+    <div class="stat-card rejected">
+      <span class="stat-label">Rejected</span>
+      <strong class="stat-value" id="rejected-count">0</strong>
+    </div>
+    <div class="stat-card pending">
+      <span class="stat-label">Pending Review</span>
+      <strong class="stat-value" id="pending-count">0</strong>
+    </div>
+  </div>
+
+  </section>
+
+  <div class="workspace">
+    <section class="panel" aria-labelledby="note-title">
+      <header class="panel-head">
+        <h2 id="note-title">Clinical Note</h2>
+        <span class="source-label">Source Text</span>
+        <details class="reading">
+          <summary>
+            <svg class="ctrl-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M8 3a.75.75 0 0 1 .75.75v6.5h6.5a.75.75 0 0 1 0 1.5h-6.5v6.5a.75.75 0 0 1-1.5 0v-6.5h-6.5a.75.75 0 0 1 0-1.5h6.5v-6.5A.75.75 0 0 1 8 3Z"/></svg>
+            Reading settings
+          </summary>
+          <div>
+            <label>Text size
+              <select id="note-size">
+                <option value="1">Standard</option>
+                <option value="1.2">Large</option>
+                <option value="1.4">Larger</option>
+              </select>
+            </label>
+            <label><input type="checkbox" id="show-highlights" checked> Highlight mentions</label>
+          </div>
+        </details>
+      </header>
+      <form id="custom-form" hidden>
+        <label for="custom-text">Clinical note text</label>
+        <textarea id="custom-text" rows="3" placeholder="Paste clinical note text here…"></textarea>
+        <button class="btn-primary">
+          <svg class="ctrl-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.857-9.809a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd"/></svg>
+          Analyze note
+        </button>
+      </form>
+      <p id="request-status" role="status">Loading validation notes…</p>
+      <div id="note-text" class="note-text empty" tabindex="0" role="region" aria-labelledby="note-title">Select or paste a note to begin.</div>
+    </section>
+
+    <section class="panel" aria-labelledby="review-title">
+      <div class="review-header">
+        <div class="review-heading"><h2 id="review-title">Mention Review</h2><span class="key-hints"><span><kbd>↑↓</kbd> Navigate</span><span><kbd>A</kbd> Approve</span><span><kbd>R</kbd> Reject</span></span></div>
+        <div class="review-tools">
+        <div class="filters" role="group" aria-label="Review filters">
+          <button id="all-filter" aria-pressed="true">All <b id="all-total">0</b></button>
+          <label class="confidence-filter">
+            <input id="confidence-filter" type="checkbox" aria-label="Show < 0.80 confidence only"> &lt; 0.80 Conf
+          </label>
+          <button id="pending-filter" aria-pressed="false">Pending</button>
+        </div>
+        <input type="search" id="mention-search" aria-label="Search mentions, terms or concept IDs" placeholder="Search mentions…">
+        </div>
+      </div>
+      <div class="table-wrap" tabindex="0" role="region" aria-labelledby="review-title">
+        <table role="table" aria-labelledby="review-title">
+          <colgroup>
+            <col class="mention-col">
+            <col class="id-col">
+            <col class="term-col">
+            <col class="confidence-col">
+            <col class="decision-col">
+          </colgroup>
+          <thead><tr>
+            <th scope="col">Mention</th>
+            <th scope="col">SNOMED CT ID</th>
+            <th scope="col">Preferred Term</th>
+            <th scope="col">Conf.</th>
+            <th scope="col">Decision</th>
+          </tr></thead>
+          <tbody id="review-rows" role="rowgroup"></tbody>
+        </table>
+        <p id="review-empty" class="empty">Mention predictions will appear here.</p>
+      </div>
+    </section>
+  </div>
+</main>
+
+<div id="mention-info" popover="manual">
+  <strong id="info-code"></strong>
+  <small>Preferred Term</small>
+  <span id="info-term"></span>
+  <div>
+    <button data-action="approved" class="info-approve">
+      <svg class="ctrl-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd"/></svg>
+      Approve (A)
+    </button>
+    <button data-action="rejected" class="info-reject">
+      <svg class="ctrl-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"/></svg>
+      Reject (R)
+    </button>
+  </div>
+</div>
+
+<dialog id="metrics-dialog" aria-labelledby="metrics-title">
+  <header class="metrics-header">
+    <h2 id="metrics-title">
+      <svg class="ctrl-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M15.5 2A1.5 1.5 0 0 0 14 3.5v13a1.5 1.5 0 0 0 3 0v-13A1.5 1.5 0 0 0 15.5 2ZM10 7a1.5 1.5 0 0 0-1.5 1.5v8a1.5 1.5 0 0 0 3 0v-8A1.5 1.5 0 0 0 10 7ZM4.5 11A1.5 1.5 0 0 0 3 12.5v4a1.5 1.5 0 0 0 3 0v-4A1.5 1.5 0 0 0 4.5 11Z"/></svg>
+      Validation Metrics
+    </h2>
+    <form method="dialog"><button autofocus class="btn-secondary">Close</button></form>
+  </header>
+  <p id="metrics-status" role="status"></p>
+  <table id="metrics-table" hidden>
+    <thead><tr>
+      <th scope="col">Metric</th>
+      <th scope="col">Exact String Lookup Baseline</th>
+      <th scope="col">Entity Linking System</th>
+    </tr></thead>
+    <tbody id="metrics-rows"></tbody>
+  </table>
+</dialog>
+</body></html>

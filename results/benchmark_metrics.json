@@ -1,0 +1,15 @@
+{
+  "validation_notes": 500,
+  "detector": "TrainingDictionaryNER",
+  "retriever": "DenseRetriever",
+  "baseline": {
+    "mention_f1": 0.3924818706526565,
+    "linking_accuracy": 0.8642533936651584,
+    "end_to_end_f1": 0.3392037886636081
+  },
+  "system": {
+    "mention_f1": 0.6910327241818954,
+    "linking_accuracy": 0.6611316113161132,
+    "end_to_end_f1": 0.45686357841053976
+  }
+}
